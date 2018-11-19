@@ -6,14 +6,15 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include_once '../config/db_handler.php';
+// include_once '../config/db_handler.php';
 include_once '../models/article.php';
 
 // instantiate database and article object
 $database = new DBhandler();
 $db = $database->connect();
 
-$article = new Article($db);
+$article = new Article();
+$crud = new Crud($db, $article);
 
 //get data
 $content = file_get_contents("php://input");
@@ -30,11 +31,9 @@ if(
   $article->body = $data->body;
 
   //create article
-  if($article->create()){
-
+  if($crud->create($article)){
     //response code 201
     http_response_code(201);
-
     //alert user
     echo json_encode(array("message" => "Article was created"));
   }
