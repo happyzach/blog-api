@@ -3,6 +3,8 @@ class Crud {
   //Connection and table variables
   private $conn;
   private $table_name;
+  private $query_params;
+  private $value_params;
 
   //constructor to setup crud object
   public function __construct($db, $obj){
@@ -11,15 +13,10 @@ class Crud {
   }
   //create record
   function create($obj, $params){
-    //Silliness to convert array to workable strings to pass in sql query
-    $params_1 = implode(',', $params);
-    //prepends colon to each array item
-    $params_2 = explode(",", (":".implode(",:", $params)));
-    //creates string for query with colon
-    $params_3 = implode(",", $params_2);
+    $this->stringify_query_params($params);
     //insert query
     $query = "INSERT INTO " . $this->table_name . "
-    ($params_1) VALUES($params_3)";
+    ($query_params) VALUES($value_params)";
     //prepare query
     $stmt = $this->conn->prepare($query);
     //sanatize data and bind VALUES
@@ -47,16 +44,20 @@ class Crud {
     return $stmt;
   }
 
-  // // Update records
-  // function update($obj, $params, $id){
-  //   //Silliness to convert array to workable strings to pass in sql query
-  //   $params_1 = implode(',', $params);
-  //   //prepends colon to each array item
-  //   $params_2 = explode(",", (":".implode(",:", $params)));
-  //   //creates string for query with colon
-  //   $params_3 = implode(",", $params_2);
-  //   //update query
-  //   $query = "UPDATE" . $this->table_name . "
-  //   SET ""
-  // }
+  // Update records
+  function update($obj, $params, $id){
+    //update query
+    $query = "UPDATE" . $this->table_name . "";
+  }
+
+  function stringify_query_params($p){
+    //Silliness to convert array to workable strings to pass in sql query
+    $params_1 = implode(',', $p);
+    //prepends colon to each array item
+    $params_2 = explode(",", (":".implode(",:", $p)));
+    //creates string for query with colon
+    $params_3 = implode(",", $params_2);
+    $this->query_params = $params_1;
+    $this->value_params = $params_3;
+  }
 }
