@@ -25,13 +25,15 @@ if(
   !empty($data->title) &&
   !empty($data->body)
   ){
-
+  //params to be entered into DB by user
+  $params = array("title", "body");
+  
   //set articles values
   $article->title = $data->title;
   $article->body = $data->body;
 
   //create article
-  if($crud->create($article)){
+  if($crud->create($article, $params)){
     //response code 201
     http_response_code(201);
     //alert user
