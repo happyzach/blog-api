@@ -16,7 +16,8 @@ class Crud {
     $this->stringify_query_params($params);
     //insert query
     $query = "INSERT INTO " . $this->table_name . "
-    ($query_params) VALUES($value_params)";
+    ($this->query_params) VALUES($this->value_params)";
+
     //prepare query
     $stmt = $this->conn->prepare($query);
     //sanatize data and bind VALUES
@@ -45,9 +46,38 @@ class Crud {
   }
 
   // Update records
-  function update($obj, $params, $id){
-    //update query
-    $query = "UPDATE" . $this->table_name . "";
+  function update($obj, $params){
+    //start query variable
+    $query = "UPDATE " . $this->table_name . " SET ";
+
+    //create set params for update query
+    foreach($params as $param){
+      $query .= $param . " = :" . $param ;
+      if($param != end($params)){
+        $query .= ",";
+      }
+    }
+
+    //end query and set id
+    $query .= " WHERE id = :id";
+
+    //prepare query statement
+    $stmt = $this->conn->prepare($query);
+
+    //sanatize data and bind VALUES
+    foreach($params as $param){
+      $obj->$param=htmlspecialchars(strip_tags($obj->$param));
+      //prepends colon to param for pdo binding
+      $bind_param = ":".$param;
+      $stmt-> bindParam($bind_param, $obj->$param);
+    }
+    $stmt-> bindParam(":id", $obj->id);
+
+    //check if it can run return true if it can
+    if($stmt->execute()){
+      return true;
+    }
+    return false;
   }
 
   function stringify_query_params($p){
