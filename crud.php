@@ -9,10 +9,14 @@ class Crud {
     $this->table_name = $obj->table_name;
   }
   //create record
-  function create($obj){
+  function create($obj, $params){
+    //Silliness to convert array to workable strings to pass in sql query
+    $params_1 = implode(',', $params);
+    $params_2 = explode(",", (":".implode(",:", $params)));
+    $params_2 = implode(",", $params_2);
     //insert query
     $query = "INSERT INTO " . $this->table_name . "
-    (title, body) VALUES(:title, :body)";
+    ($params_1) VALUES($params_2)";
     //prepare query
     $stmt = $this->conn->prepare($query);
     //sanatize data
