@@ -43,7 +43,7 @@ if($num>0){
         extract($row);
 
         $article_item=array(
-            "article_id" => $article_id,
+            "id" => $id,
             "title" => $title,
             "body" => $body
         );

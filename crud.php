@@ -5,6 +5,7 @@ class Crud {
   private $table_name;
   private $query_params;
   private $value_params;
+  private $stmt;
 
   //constructor to setup crud object
   public function __construct($db, $obj){
@@ -18,17 +19,10 @@ class Crud {
     $query = "INSERT INTO " . $this->table_name . "
     ($this->query_params) VALUES($this->value_params)";
 
-    //prepare query
-    $stmt = $this->conn->prepare($query);
-    //sanatize data and bind VALUES
-    foreach($params as $param){
-      $obj->$param=htmlspecialchars(strip_tags($obj->$param));
-      //prepends colon to param for pdo binding
-      $bind_param = ":".$param;
-      $stmt-> bindParam($bind_param, $obj->$param);
-    }
+    $this->prepare_queryData($obj, $query, $params);
+
     //check if it can run return true if it can
-    if($stmt->execute()){
+    if($this->stmt->execute()){
       return true;
     }
     return false;
@@ -57,24 +51,16 @@ class Crud {
         $query .= ",";
       }
     }
-
+    
     //end query and set id
     $query .= " WHERE id = :id";
 
-    //prepare query statement
-    $stmt = $this->conn->prepare($query);
+    $this->prepare_queryData($obj, $query, $params);
 
-    //sanatize data and bind VALUES
-    foreach($params as $param){
-      $obj->$param=htmlspecialchars(strip_tags($obj->$param));
-      //prepends colon to param for pdo binding
-      $bind_param = ":".$param;
-      $stmt-> bindParam($bind_param, $obj->$param);
-    }
-    $stmt-> bindParam(":id", $obj->id);
+    $this->stmt-> bindParam(":id", $obj->id);
 
     //check if it can run return true if it can
-    if($stmt->execute()){
+    if($this->stmt->execute()){
       return true;
     }
     return false;
@@ -89,5 +75,19 @@ class Crud {
     $params_3 = implode(",", $params_2);
     $this->query_params = $params_1;
     $this->value_params = $params_3;
+  }
+
+  function prepare_queryData($o, $q, $p){
+    //prepare query
+    $stmt = $this->conn->prepare($q);
+    //sanatize data and bind VALUES
+    foreach($p as $param){
+      $o->$param=htmlspecialchars(strip_tags($o->$param));
+      //prepends colon to param for pdo binding
+      $bind_param = ":".$param;
+      $stmt-> bindParam($bind_param, $o->$param);
+    }
+    //return PDOStatement
+    $this->stmt = $stmt;
   }
 }
