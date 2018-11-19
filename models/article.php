@@ -4,7 +4,7 @@ class Article{
   //Table name
   public  $table_name = "articles";
   // object properties
-  public $article_id;
+  public $id;
   public $title;
   public $body;
   public $created_at;
