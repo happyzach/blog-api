@@ -6,7 +6,7 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// include_once '../config/db_handler.php';
+include_once '../config/db_handler.php';
 include_once '../models/article.php';
 
 // instantiate database and article object
@@ -27,7 +27,7 @@ if(
   ){
   //params to be entered into DB by user
   $params = array("title", "body");
-  
+
   //set articles values
   $article->title = $data->title;
   $article->body = $data->body;
@@ -45,14 +45,11 @@ if(
 
     //response code 503
     http_response_code(503);
-
     echo json_encode(array("message" => "Unable to create article"));
   }
 }
 else{
   //data is incomplete
-
   http_response_code(400);
-
   echo json_encode(array("message" => "Unable to create article. Something is missing"));
 }

@@ -12,10 +12,11 @@ $database = new DBhandler();
 $db = $database->connect();
 
 // initialize object
-$article = new Article($db);
+$article = new Article();
+$crud = new Crud($db, $article);
 
 // query articles
-$stmt = $article->read();
+$stmt = $crud->read($article);
 $num = $stmt->rowCount();
 
 // check if more than 0 record found

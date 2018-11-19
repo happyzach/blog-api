@@ -1,5 +1,4 @@
 <?php
-include_once '../config/db_handler.php';
 class Crud {
   //Connection and table variables
   private $conn;
@@ -35,5 +34,16 @@ class Crud {
       return true;
     }
     return false;
+  }
+
+  // read records
+  function read($obj){
+    // select all query
+    $query = "SELECT * FROM " . $this->table_name;
+    // prepare query statement
+    $stmt = $this->conn->prepare($query);
+    // execute query
+    $stmt->execute();
+    return $stmt;
   }
 }
