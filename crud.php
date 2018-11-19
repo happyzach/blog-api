@@ -37,13 +37,26 @@ class Crud {
   }
 
   // read records
-  function read($obj){
+  function read($obj, $quantity){
     // select all query
-    $query = "SELECT * FROM " . $this->table_name;
+    $query = "SELECT * FROM " . $this->table_name . " LIMIT " . $quantity;
     // prepare query statement
     $stmt = $this->conn->prepare($query);
     // execute query
     $stmt->execute();
     return $stmt;
   }
+
+  // // Update records
+  // function update($obj, $params, $id){
+  //   //Silliness to convert array to workable strings to pass in sql query
+  //   $params_1 = implode(',', $params);
+  //   //prepends colon to each array item
+  //   $params_2 = explode(",", (":".implode(",:", $params)));
+  //   //creates string for query with colon
+  //   $params_3 = implode(",", $params_2);
+  //   //update query
+  //   $query = "UPDATE" . $this->table_name . "
+  //   SET ""
+  // }
 }
