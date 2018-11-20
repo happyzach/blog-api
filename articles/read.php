@@ -16,7 +16,7 @@ $article = new Article();
 $crud = new Crud($db, $article);
 
 //limit amount of records being read
-$query_limit = "5";
+$query_limit = "100";
 
 //get data
 $content = file_get_contents("php://input");
