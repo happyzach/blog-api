@@ -101,26 +101,53 @@ class Crud {
 
   // Delete record
   function delete($obj){
+    //check if it exists and is then able to delete it if so
+    if($this->check_presence($obj, "id")){
+      // delete query
+      $query = "DELETE FROM " . $obj->table_name . " WHERE id = :id";
 
-    // delete query
-    $query = "DELETE FROM " . $obj->table_name . " WHERE id = :id";
+      // prepare query
+      $stmt = $this->conn->prepare($query);
+
+      // sanitize
+      $obj->id=htmlspecialchars(strip_tags($obj->id));
+
+      // bind id of record to delete
+      $stmt->bindParam(":id", $obj->id);
+
+      // execute query
+      if($stmt->execute()){
+        return true;
+      }
+      return false;
+    }
+    else{
+      return false;
+    }
+  }
+
+  function check_presence($obj, $param){
+
+    //query to check count of param
+    $query = "SELECT * FROM " . $obj->table_name . " WHERE " . $param .   " = ?" ;
 
     // prepare query
     $stmt = $this->conn->prepare($query);
 
     // sanitize
-    $obj->id=htmlspecialchars(strip_tags($obj->id));
-
-    // bind id of record to delete
-    $stmt->bindParam(":id", $obj->id);
+    $obj->$param=htmlspecialchars(strip_tags($obj->$param));
 
     // execute query
-    if($stmt->execute()){
-       return true;
-    }
-    return false;
+    $stmt->execute([$obj->$param]);
 
+    if($stmt->rowCount()>0){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
+
 
   function stringify_query_params($p){
     //Silliness to convert array to workable strings to pass in sql query
