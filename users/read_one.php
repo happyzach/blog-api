@@ -26,24 +26,25 @@ $data = json_decode($content);
 if(!empty($data->id)){
   $user->id = $data->id;
 
-  //delete record
-  if($crud->delete($user)){
-    //response code 201
-    http_response_code(201);
-    //alert user
-    echo json_encode(array("message" => "user was deleted"));
-  }
+  //query user id
+  $stmt = $crud->read_one($user);
+  $num = $stmt->rowCount();
 
-  //tell user that it was not deleted
+  //check to see if there is a record
+  if($num>0){
+    //retrive contents
+    $single_user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // set response code - 200 OK
+    http_response_code(200);
+
+    // show users data in json format
+    echo json_encode($single_user);
+  }
   else{
-
-    //response code 503
-    http_response_code(503);
-    echo json_encode(array("message" => "Unable to delete user"));
+    //data is incomplete
+    http_response_code(400);
+    echo json_encode(array("message" => "user not found"));
   }
-}
-else{
-  //data is incomplete
-  http_response_code(400);
-  echo json_encode(array("message" => "Unable to delete user. Something is missing"));
+
 }
