@@ -30,6 +30,8 @@ class SessionsHandler {
 
       //check the database for the token
       if($crud->check_presence($user_session, "token")){
+
+        //query the database for the session based on the token
         $query = "SELECT * FROM " . $user_session->table_name . " WHERE token = :token";
         $stmt = $db->prepare($query);
 
@@ -51,22 +53,23 @@ class SessionsHandler {
             http_response_code(200);
 
             //bind params to object
-            $user_session->id = $session_data["id"];
-            $user_session->token = $session_data["token"];
-            $user_session->user_id = $session_data["user_id"];
-            $user_session->created_at = $session_data["created_at"];
+            $user_session->id           = $session_data["id"];
+            $user_session->token        = $session_data["token"];
+            $user_session->user_id      = $session_data["user_id"];
+            $user_session->expire_on    = $session_data["expire_on"];
+            $user_session->created_at   = $session_data["created_at"];
 
-            //set timestamp for tomorrows date for server side time out
-            $datetime = new DateTime('tomorrow');
-            $timestamp = $datetime->format('Y-m-d G:i:s');
+            //check todays date
+            $timestamp = date('Y-m-d G:i:s');
 
             //check against date
-            if($timestamp >= $user_session->created_at){
-              setcookie("auth_token", "", time()-3600);
-              return true;
+            if($timestamp>=$user_session->expire_on){
+              //delete session from database
+              $crud->delete($user_session);
+              return false;
             }
             else{
-              return false;
+              return true;
             }
           }
           else{
@@ -87,28 +90,34 @@ class SessionsHandler {
   }
 
   //log in
-  public function log_in($u, $s_token){
+  public function log_in($user, $server_token){
     // instantiate database
     $database = new DBhandler();
     $db = $database->connect();
 
     //create token for database
-    $u_token = base64_encode($u->username . $u->password);
-    $token = $u_token . "." . $s_token;
+    $user_token = base64_encode($user->username . $user->password);
+    $token = $user_token . "." . $server_token;
+
+    //set timestamp for tomorrows date for server side time out
+    $datetime = new DateTime('tomorrow');
+    $timestamp = $datetime->format('Y-m-d G:i:s');
 
     //create session and bind values
-    $user_session = new Session();
-    $user_session->user_id = $u->id;
-    $user_session->token = $token;
+    $user_session             = new Session();
+    $user_session->user_id    = $user->id;
+    $user_session->token      = $token;
+    $user_session->expire_on  = $timestamp;
 
     //params for create fucntion in crud
-    $params = array("user_id", "token");
+    $params = array("user_id", "token", "expire_on");
 
     //set crud for sessions
     $crud = new Crud($db, $user_session);
 
     //create session
     if($crud->create($user_session, $params)){
+      //return token to be used in cookies
       return $token;
     }
     else{
