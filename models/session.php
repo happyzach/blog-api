@@ -7,5 +7,6 @@ class Session{
   public $id;
   public $token;
   public $user_id;
+  public $expire_on;
   public $created_at;
 }
