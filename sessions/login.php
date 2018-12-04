@@ -67,12 +67,12 @@ else{
           http_response_code(200);
 
           //bind params to object
-          $user->id = $user_data["id"];
-          $user->username = $user_data["username"];
-          $user->email = $user_data["email"];
-          $user->password = $user_data["password"];
-          $user->created_at = $user_data["created_at"];
-          $user->updated_at = $user_data["updated_at"];
+          $user->id           = $user_data["id"];
+          $user->username     = $user_data["username"];
+          $user->email        = $user_data["email"];
+          $user->password     = $user_data["password"];
+          $user->created_at   = $user_data["created_at"];
+          $user->updated_at   = $user_data["updated_at"];
 
           //verify password
           if(password_verify($data->password, $user->password)){
@@ -86,6 +86,9 @@ else{
 
             //86400 = 1 day
             setcookie($cookie_name, $cookie_value, time() + (86400), "/");
+
+            http_response_code(200);
+            echo json_encode(array("message" => "Successfully signed in."));
 
           }
           else{
